@@ -1,1 +1,1 @@
-python3 ./set_background/main.py
+python set_background.py
