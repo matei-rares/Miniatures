@@ -7,14 +7,18 @@ url="https://www.weinfuerst.de/products/lago-vero-garda-frizzante"
 
 def extract_dynamic_wine_review(wine_url):
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True)
-        page = browser.new_page()
-        page.goto(wine_url)
-        page.wait_for_selector("div#ReviewsWidget")
-        content = page.content()
-        soup = BeautifulSoup(content, 'html.parser')
-        reviews_widget = soup.select("div.R-TextHeading.R-TextHeading--md.R-TextHeading--inline.u-marginBottom--none.u-marginRight--xs.u-verticalAlign--middle")[0].get_text(strip=True)
-        browser.close()
+        try:
+            browser = p.chromium.launch(headless=True)
+            page = browser.new_page()
+            page.goto(wine_url)
+            page.wait_for_selector("div#ReviewsWidget")
+            content = page.content()
+            soup = BeautifulSoup(content, 'html.parser')
+            reviews_widget = soup.select("div.R-TextHeading.R-TextHeading--md.R-TextHeading--inline.u-marginBottom--none.u-marginRight--xs.u-verticalAlign--middle")[0].get_text(strip=True)
+            browser.close()
+        except Exception as e:
+
+            reviews_widget = "0"
         return reviews_widget
 
 
