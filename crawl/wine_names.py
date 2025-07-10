@@ -32,8 +32,6 @@ class Wine:
 
 # Sort wines by vivino_rev (desc), wunder_review (desc), and price (asc)
 
-
-# wine_links = [a['href'] for a in soup.select('a.product-link') if 'href' in a.attrs]
 def save_to_excel(wines, filename="wines.xlsx"):
     data = [{"Name": wine.name, "Price": wine.price, "Type": wine.type, "Grape": wine.grape,
              "Country": wine.country, "Litres": wine.litres, "Alc_Per": wine.alc_per,
@@ -114,7 +112,7 @@ def main():
     all_wines=[]
     all_wines = extract_wine_from_page(BASE_COLLECTION_URL)
 
-    while page_number < 8:  # TODO loop through all 7 pages
+    while page_number < 8:
         page_url = f'{BASE_COLLECTION_URL}/?page={page_number}'
         wines = extract_wine_from_page(page_url)
         all_wines.extend(wines)

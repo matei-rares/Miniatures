@@ -1,1 +1,1 @@
-##### Hi there! This repository is like a folder for testing different apis or atuomate stuff.
+##### Hi there! This repository is like a folder for testing different apis/frameworks or atuomate stuff.

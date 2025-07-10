@@ -34,7 +34,6 @@ def extract_vivino_review(name):
 
         # Optionally, print the page content to inspect what is loaded
         content = page.content()
-
         # Extract the content and parse with BeautifulSoup
         soup = BeautifulSoup(page.content(), 'html.parser')
 
@@ -46,5 +45,5 @@ def extract_vivino_review(name):
         return reviews
 
 
-# Example usage
-#extract_vivino_review("Lago Vero Garda Frizzante")
+
+print(extract_dynamic_wine_review(url))
