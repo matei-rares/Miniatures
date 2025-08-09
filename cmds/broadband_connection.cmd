@@ -1,1 +1,0 @@
-rasdial "Broadband Connection" name.2@email.com password
