@@ -17,4 +17,10 @@ npm run build
 
 WHAT YOU'LL USE
 npx vite
+
+
+npm install --save three
+npm install --save-dev vite
+npm install @dimforge/rapier3d-compat
+
 ```
