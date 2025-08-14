@@ -15,7 +15,7 @@ npm run dev
 # Build for production in the dist/ directory
 npm run build
 
-WHAT YOU'LL USE
+WHAT YOU WILL USE
 npx vite
 
 
