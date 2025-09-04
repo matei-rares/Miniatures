@@ -10,10 +10,10 @@
   "devDependencies": {
     "vite": "^6.3.5",
     "vite-plugin-restart": "^0.4.2"
-
   },
   "dependencies": {
     "@dimforge/rapier3d": "^0.18.2",
+    "@dimforge/rapier3d-compat": "^0.18.2",
     "three": "^0.174.0"
   }
 }
