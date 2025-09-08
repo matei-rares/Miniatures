@@ -35,7 +35,7 @@ scene.add(dir);
 
 // Ground (visual)
 const groundGeo = new THREE.PlaneGeometry(40, 40);
-const groundMat = new THREE.MeshStandardMaterial({ color: 0x20273a, metalness: 0.0, roughness: 0.9 });
+const groundMat = new THREE.MeshStandardMaterial({ color: 0x20273a, metalness: 0.0, roughness: 1.9 });
 const ground = new THREE.Mesh(groundGeo, groundMat);
 ground.rotation.x = -Math.PI / 2;
 ground.receiveShadow = true;
@@ -56,20 +56,22 @@ const world = new RAPIER.World(gravity);
 
 // Utility: create a cube (Three + Rapier) and return pair
 const boxes = [];
-function makeCube({ position = [0, 1, 0], size = 1, color = 0x66aaff, dynamic = true, name = 'cube' }) {
+function makeCube({ position = [0, 1, 0], size = 1, color = 0x66aaff, name = 'cube' }) {
     const half = size / 2;
 
     // Three mesh
     const geo = new THREE.BoxGeometry(size, size, size);
-    const mat = new THREE.MeshStandardMaterial({ color, metalness: 0.1, roughness: 0.6 });
+    const mat = new THREE.MeshStandardMaterial({ color, metalness: 0.1, roughness: 10.6 });
     const mesh = new THREE.Mesh(geo, mat);
     mesh.castShadow = true; mesh.receiveShadow = true; mesh.name = name;
     scene.add(mesh);
 
     // Rapier body + collider
-    const rbDesc = (dynamic ? RAPIER.RigidBodyDesc.dynamic() : RAPIER.RigidBodyDesc.kinematicPositionBased())
+    const rbDesc = RAPIER.RigidBodyDesc.dynamic() 
         .setTranslation(position[0], position[1], position[2])
-        .setCanSleep(true);
+        .setCanSleep(true)
+        .setLinearDamping(5.0); //Higher = stoping faster
+
     const body = world.createRigidBody(rbDesc);
     const colDesc = RAPIER.ColliderDesc.cuboid(half, half, half)
         .setFriction(0.8)
@@ -95,18 +97,43 @@ function resetCubes() {
         b.body.setAngvel({ x: 0, y: 0, z: 0 }, true);
     });
 }
-function moveCubeOnDKey() {
-    if (!mainCube) return;
-    mainCube.body.setLinvel({ x: 5, y: 0, z: -5 }, true);
-    mainCube.body.setAngvel({ x: 0, y: 0, z: 0 }, true);
+
+function moveObjectOnDKey(obj) {
+    if (!obj) return;
+//    obj.body.setLinvel({ x: 5, y: 0, z: -5 }, true);
+    obj.body.applyImpulse({ x: 5, y: 0, z: -5 }, true);
+
+    obj.body.setAngvel({ x: 0, y: 0, z: 0 }, true);
 }
+function moveObjectOnAKey(obj) {
+    if (!mainCube) return;
+    obj.body.setLinvel({ x: -5, y: 0, z: 5 }, true);
+    obj.body.setAngvel({ x: 0, y: 0, z: 0 }, true);
+}
+function moveObjectOnWKey(obj) {
+    if (!mainCube) return;
+    obj.body.setLinvel({ x: -5, y: 0, z: -5 }, true);
+    obj.body.setAngvel({ x: 0, y: 0, z: 0 }, true);
+}
+function moveObjectOnSKey(obj) {
+    if (!mainCube) return;
+    obj.body.setLinvel({ x: 5, y: 0, z: 5 }, true);
+    obj.body.setAngvel({ x: 0, y: 0, z: 0 }, true);
+}
+
+
 
 addEventListener('keydown', (e) => { if (e.key.toLowerCase() === 'r') resetCubes(); });
 addEventListener('keydown', (e) => { 
     if (e.key.toLowerCase() === 'd' ) 
-        moveCubeOnDKey(); 
+        moveObjectOnDKey(mainCube); 
+    else if (e.key.toLowerCase() === 'w' )
+        moveObjectOnWKey(mainCube); 
     else if (e.key.toLowerCase() === 'a' )
-         return;
+        moveObjectOnAKey(mainCube); 
+    else if (e.key.toLowerCase() === 's' )
+        moveObjectOnSKey(mainCube); 
+
 });
 
 
