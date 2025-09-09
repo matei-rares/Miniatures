@@ -100,10 +100,12 @@ function resetCubes() {
 
 function moveObjectOnDKey(obj) {
     if (!obj) return;
-//    obj.body.setLinvel({ x: 5, y: 0, z: -5 }, true);
-    obj.body.applyImpulse({ x: 5, y: 0, z: -5 }, true);
+    obj.body.setLinvel({ x: 5, y: 0, z: -5 }, true);
+//    obj.body.applyImpulse({ x: 5, y: 0, z: -5 }, true);
 
     obj.body.setAngvel({ x: 0, y: 0, z: 0 }, true);
+    obj.body.wakeUp(); // make sure Rapier applies it right away
+
 }
 function moveObjectOnAKey(obj) {
     if (!mainCube) return;
@@ -125,16 +127,19 @@ function moveObjectOnSKey(obj) {
 
 addEventListener('keydown', (e) => { if (e.key.toLowerCase() === 'r') resetCubes(); });
 addEventListener('keydown', (e) => { 
-    if (e.key.toLowerCase() === 'd' ) 
-        moveObjectOnDKey(mainCube); 
-    else if (e.key.toLowerCase() === 'w' )
-        moveObjectOnWKey(mainCube); 
-    else if (e.key.toLowerCase() === 'a' )
-        moveObjectOnAKey(mainCube); 
-    else if (e.key.toLowerCase() === 's' )
-        moveObjectOnSKey(mainCube); 
+    // if (e.key.toLowerCase() === 'd' ) 
+    //     moveObjectOnDKey(mainCube); 
+    // else if (e.key.toLowerCase() === 'w' )
+    //     moveObjectOnWKey(mainCube); 
+    // else if (e.key.toLowerCase() === 'a' )
+    //     moveObjectOnAKey(mainCube); 
+    // else if (e.key.toLowerCase() === 's' )
+    //     moveObjectOnSKey(mainCube); 
 
 });
+const pressed = {}
+window.addEventListener("keydown", e => pressed[e.code] = true);
+window.addEventListener("keyup", e => pressed[e.code] = false);
 
 
 // --- Animation loop with fixed-step accumulator ---
@@ -142,18 +147,64 @@ let last = performance.now();
 const FIXED_TIMESTEP = 1 / 60; // seconds
 let accumulator = 0;
 
+//main function--------------------------------------------
 function animate(now = performance.now()) {
     requestAnimationFrame(animate);
     const dt = Math.min(0.033, (now - last) / 1000);
     last = now;
     accumulator += dt;
 
-    // Step physics at a fixed rate for stability
+   // Step physics at a fixed rate for stability
     while (accumulator >= FIXED_TIMESTEP) {
         world.timestep = FIXED_TIMESTEP; // optional explicit step
         world.step();
         accumulator -= FIXED_TIMESTEP;
     }
+
+    // if(pressed["KeyD"]=== true){
+    //     moveObjectOnDKey(mainCube);
+    // }
+    // if(pressed["KeyA"]=== true){
+    //     moveObjectOnAKey(mainCube);
+    // }
+    // if(pressed["KeyW"]=== true){
+    //     moveObjectOnWKey(mainCube);
+    // }
+    // if(pressed["KeyS"]=== true){
+    //     moveObjectOnSKey(mainCube);
+    // }
+
+
+let moveX = 0;
+let moveZ = 0;
+
+// check keys
+if (pressed["KeyW"]) { moveX-= 5;  moveZ-= 5;}   // forward
+if (pressed["KeyS"]){moveX += 5;moveZ += 5;}   // backward
+if (pressed["KeyA"]) {moveX -=5;moveZ += 5;}  // left
+if (pressed["KeyD"]) {moveX+=5 ; moveZ -= 5;}  // right
+
+// create a direction vector
+let dir = new THREE.Vector3(moveX, 0, moveZ);
+
+// normalize so diagonal speed = straight speed
+if (dir.length() > 0) {
+  dir.normalize();
+  
+  // apply movement (example: impulse or set linvel)
+  const speed = 15.0;
+  mainCube.body.setLinvel(
+    {
+      x: dir.x * speed,
+      y: mainCube.body.linvel().y, // keep current vertical velocity (gravity/jumps)
+      z: dir.z * speed,
+    },
+    true
+  );
+}
+
+
+
 
     // Sync Three meshes from Rapier bodies
     for (const { mesh, body } of boxes) {
