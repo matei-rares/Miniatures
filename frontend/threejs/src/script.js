@@ -1,6 +1,8 @@
 import * as THREE from 'three'
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import RAPIER from '@dimforge/rapier3d-compat';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+
 
 // --- Three.js setup ---
 const container = document.getElementById('app');
@@ -84,6 +86,19 @@ function makeCube({ position = [0, 1, 0], size = 1, color = 0x66aaff, name = 'cu
     boxes.push({ mesh, body });
     return { mesh, body };
 }
+
+
+
+const loader = new GLTFLoader();
+let player;
+
+loader.load('/static/model.glb', (gltf) => {
+  player = gltf.scene;
+  player.scale.set(0.5,0.5, 0.5); // resize
+  scene.add(player);
+}, undefined, (error) => {
+  console.error(error);
+});
 
 // --- Create two cubes ---
 const initialCubePosition = [1.25, 3, 0]
