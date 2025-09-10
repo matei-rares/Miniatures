@@ -17,8 +17,8 @@ scene.background = new THREE.Color(0x0b5020);
 
 //Camera
 const camera = new THREE.PerspectiveCamera(60, innerWidth / innerHeight, 0.1, 200);
-const cameraDefaultPos= new THREE.Vector3(0, 5, 7)
-camera.position.set(cameraDefaultPos.x,cameraDefaultPos.y,cameraDefaultPos.z);
+const cameraDefaultPos = new THREE.Vector3(0, 5, 7)
+camera.position.set(cameraDefaultPos.x, cameraDefaultPos.y, cameraDefaultPos.z);
 
 //View Target
 const controls = new OrbitControls(camera, renderer.domElement);
@@ -62,9 +62,9 @@ function makeCube({ position = [0, 1, 0], size = 1, color = 0x66aaff, name = 'cu
 
     // Three mesh (visuals)
     const geo = new THREE.BoxGeometry(size, size, size);
-    const baseMat = new THREE.MeshStandardMaterial({ color, metalness: 0.1, roughness: 0.6, wireframe: true});
-    const darkMat = new THREE.MeshStandardMaterial({ color: 0x335577, metalness: 0.1, roughness: 0.6  }); // make a face darker as the front of the cube
-    const materials = [baseMat,baseMat, baseMat, baseMat, darkMat, baseMat];
+    const baseMat = new THREE.MeshStandardMaterial({ color, metalness: 0.1, roughness: 0.6, wireframe: true });
+    const darkMat = new THREE.MeshStandardMaterial({ color: 0x335577, metalness: 0.1, roughness: 0.6 }); // make a face darker as the front of the cube
+    const materials = [baseMat, baseMat, baseMat, baseMat, darkMat, baseMat];
     const mesh = new THREE.Mesh(geo, materials);
     mesh.castShadow = true; mesh.receiveShadow = true; mesh.name = name;
     scene.add(mesh);
@@ -116,10 +116,10 @@ function processMovement() {
     const speed = 4.0;
     const turnSpeed = 10.0; // radians/sec
     // check keys
-    if (pressed["KeyW"]) {  moveZ -= 5; }   // forward
-    if (pressed["KeyS"]) {  moveZ += 5; }   // backward
-    if (pressed["KeyA"]) { moveX -= 5;  }  // left
-    if (pressed["KeyD"]) { moveX += 5;  }  // right
+    if (pressed["KeyW"]) { moveZ -= 5; }   // forward
+    if (pressed["KeyS"]) { moveZ += 5; }   // backward
+    if (pressed["KeyA"]) { moveX -= 5; }  // left
+    if (pressed["KeyD"]) { moveX += 5; }  // right
 
     // create a direction vector
     let dir = new THREE.Vector3(moveX, 0, moveZ);
@@ -129,24 +129,24 @@ function processMovement() {
         dir.normalize();
 
         // apply movement (example: impulse or set linvel)
-        
+
         //obj.body.applyImpulse({ x: 5, y: 0, z: -5 }, true);
         //obj.body.setAngvel({ x: 0, y: 0, z: 0 }, true);
         mainCube.body.setLinvel({
-                x: dir.x * speed,
-                y: mainCube.body.linvel().y, // keep current vertical velocity (gravity/jumps)
-                z: dir.z * speed,
-            },true
+            x: dir.x * speed,
+            y: mainCube.body.linvel().y, // keep current vertical velocity (gravity/jumps)
+            z: dir.z * speed,
+        }, true
         );
 
 
-       // 1. target yaw
+        // 1. target yaw
         const targetAngle = Math.atan2(dir.x, dir.z);
 
         // 2. current yaw from Rapier body quaternion
         const rot = mainCube.body.rotation();
         const q = new THREE.Quaternion(rot.x, rot.y, rot.z, rot.w);
-        const euler = new THREE.Euler().setFromQuaternion(q, 'YXZ'); 
+        const euler = new THREE.Euler().setFromQuaternion(q, 'YXZ');
         const currentAngle = euler.y;
 
         // 3. shortest angle difference
@@ -181,7 +181,7 @@ function animate(now = performance.now()) {
     }
 
 
-    if(pressed["KeyR"]) resetCubes();
+    if (pressed["KeyR"]) resetCubes();
 
     processMovement();
 
