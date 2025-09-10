@@ -1,6 +1,6 @@
 import * as THREE from 'three'
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import  RAPIER  from '@dimforge/rapier3d-compat';
+import RAPIER from '@dimforge/rapier3d-compat';
 
 // --- Three.js setup ---
 const container = document.getElementById('app');
@@ -17,7 +17,8 @@ scene.background = new THREE.Color(0x0b5020);
 
 //Camera
 const camera = new THREE.PerspectiveCamera(60, innerWidth / innerHeight, 0.1, 200);
-camera.position.set(6, 7, 8);
+const cameraDefaultPos= new THREE.Vector3(0, 5, 7)
+camera.position.set(cameraDefaultPos.x,cameraDefaultPos.y,cameraDefaultPos.z);
 
 //View Target
 const controls = new OrbitControls(camera, renderer.domElement);
@@ -50,7 +51,7 @@ const world = new RAPIER.World(gravity);
 {
     const groundBodyDesc = RAPIER.RigidBodyDesc.fixed().setTranslation(0, -0.5, 0);
     const groundBody = world.createRigidBody(groundBodyDesc);
-    const groundColliderDesc = RAPIER.ColliderDesc.cuboid(20, 0.5, 20);
+    const groundColliderDesc = RAPIER.ColliderDesc.cuboid(20, 0.5, 20).setFriction(0.5);
     world.createCollider(groundColliderDesc, groundBody);
 }
 
@@ -59,15 +60,17 @@ const boxes = [];
 function makeCube({ position = [0, 1, 0], size = 1, color = 0x66aaff, name = 'cube' }) {
     const half = size / 2;
 
-    // Three mesh
+    // Three mesh (visuals)
     const geo = new THREE.BoxGeometry(size, size, size);
-    const mat = new THREE.MeshStandardMaterial({ color, metalness: 0.1, roughness: 10.6 });
-    const mesh = new THREE.Mesh(geo, mat);
+    const baseMat = new THREE.MeshStandardMaterial({ color, metalness: 0.1, roughness: 0.6, wireframe: true});
+    const darkMat = new THREE.MeshStandardMaterial({ color: 0x335577, metalness: 0.1, roughness: 0.6  }); // make a face darker as the front of the cube
+    const materials = [baseMat,baseMat, baseMat, baseMat, darkMat, baseMat];
+    const mesh = new THREE.Mesh(geo, materials);
     mesh.castShadow = true; mesh.receiveShadow = true; mesh.name = name;
     scene.add(mesh);
 
-    // Rapier body + collider
-    const rbDesc = RAPIER.RigidBodyDesc.dynamic() 
+    // Rapier body + collider (phisics)
+    const rbDesc = RAPIER.RigidBodyDesc.dynamic()
         .setTranslation(position[0], position[1], position[2])
         .setCanSleep(true)
         .setLinearDamping(5.0); //Higher = stoping faster
@@ -83,7 +86,7 @@ function makeCube({ position = [0, 1, 0], size = 1, color = 0x66aaff, name = 'cu
 }
 
 // --- Create two cubes ---
-const initialCubePosition=[1.25, 3, 0]
+const initialCubePosition = [1.25, 3, 0]
 makeCube({ position: initialCubePosition, size: 1, color: 0x66aaff, name: 'Cube A' });
 makeCube({ position: [-1.25, 3, 0], size: 1, color: 0xff7780, name: 'Cube B' });
 const mainCube = boxes[0]
@@ -98,49 +101,66 @@ function resetCubes() {
     });
 }
 
-function moveObjectOnDKey(obj) {
-    if (!obj) return;
-    obj.body.setLinvel({ x: 5, y: 0, z: -5 }, true);
-//    obj.body.applyImpulse({ x: 5, y: 0, z: -5 }, true);
-
-    obj.body.setAngvel({ x: 0, y: 0, z: 0 }, true);
-    obj.body.wakeUp(); // make sure Rapier applies it right away
-
-}
-function moveObjectOnAKey(obj) {
-    if (!mainCube) return;
-    obj.body.setLinvel({ x: -5, y: 0, z: 5 }, true);
-    obj.body.setAngvel({ x: 0, y: 0, z: 0 }, true);
-}
-function moveObjectOnWKey(obj) {
-    if (!mainCube) return;
-    obj.body.setLinvel({ x: -5, y: 0, z: -5 }, true);
-    obj.body.setAngvel({ x: 0, y: 0, z: 0 }, true);
-}
-function moveObjectOnSKey(obj) {
-    if (!mainCube) return;
-    obj.body.setLinvel({ x: 5, y: 0, z: 5 }, true);
-    obj.body.setAngvel({ x: 0, y: 0, z: 0 }, true);
-}
-
-
-
-addEventListener('keydown', (e) => { if (e.key.toLowerCase() === 'r') resetCubes(); });
-addEventListener('keydown', (e) => { 
-    // if (e.key.toLowerCase() === 'd' ) 
-    //     moveObjectOnDKey(mainCube); 
-    // else if (e.key.toLowerCase() === 'w' )
-    //     moveObjectOnWKey(mainCube); 
-    // else if (e.key.toLowerCase() === 'a' )
-    //     moveObjectOnAKey(mainCube); 
-    // else if (e.key.toLowerCase() === 's' )
-    //     moveObjectOnSKey(mainCube); 
-
-});
+//Bind Keyboard keys Listeners (for Movement, reset)
 const pressed = {}
-window.addEventListener("keydown", e => pressed[e.code] = true);
-window.addEventListener("keyup", e => pressed[e.code] = false);
+{
+    window.addEventListener("keydown", e => pressed[e.code] = true);
+    window.addEventListener("keyup", e => pressed[e.code] = false);
+}
 
+
+
+function processMovement() {
+    let moveX = 0;
+    let moveZ = 0;
+    const speed = 4.0;
+    const turnSpeed = 10.0; // radians/sec
+    // check keys
+    if (pressed["KeyW"]) {  moveZ -= 5; }   // forward
+    if (pressed["KeyS"]) {  moveZ += 5; }   // backward
+    if (pressed["KeyA"]) { moveX -= 5;  }  // left
+    if (pressed["KeyD"]) { moveX += 5;  }  // right
+
+    // create a direction vector
+    let dir = new THREE.Vector3(moveX, 0, moveZ);
+
+    // normalize so diagonal speed = straight speed
+    if (dir.length() > 0) {
+        dir.normalize();
+
+        // apply movement (example: impulse or set linvel)
+        
+        //obj.body.applyImpulse({ x: 5, y: 0, z: -5 }, true);
+        //obj.body.setAngvel({ x: 0, y: 0, z: 0 }, true);
+        mainCube.body.setLinvel({
+                x: dir.x * speed,
+                y: mainCube.body.linvel().y, // keep current vertical velocity (gravity/jumps)
+                z: dir.z * speed,
+            },true
+        );
+
+
+       // 1. target yaw
+        const targetAngle = Math.atan2(dir.x, dir.z);
+
+        // 2. current yaw from Rapier body quaternion
+        const rot = mainCube.body.rotation();
+        const q = new THREE.Quaternion(rot.x, rot.y, rot.z, rot.w);
+        const euler = new THREE.Euler().setFromQuaternion(q, 'YXZ'); 
+        const currentAngle = euler.y;
+
+        // 3. shortest angle difference
+        let delta = targetAngle - currentAngle;
+        delta = Math.atan2(Math.sin(delta), Math.cos(delta)); // normalize to [-π, π]
+
+        // 4. choose rotation speed
+        const angVel = delta * turnSpeed;
+
+        // 5. set angular velocity around Y axis
+        mainCube.body.setAngvel({ x: 0, y: angVel, z: 0 }, true);
+
+    }
+}
 
 // --- Animation loop with fixed-step accumulator ---
 let last = performance.now();
@@ -153,55 +173,17 @@ function animate(now = performance.now()) {
     const dt = Math.min(0.033, (now - last) / 1000);
     last = now;
     accumulator += dt;
-
-   // Step physics at a fixed rate for stability
+    // Step physics at a fixed rate for stability
     while (accumulator >= FIXED_TIMESTEP) {
         world.timestep = FIXED_TIMESTEP; // optional explicit step
         world.step();
         accumulator -= FIXED_TIMESTEP;
     }
 
-    // if(pressed["KeyD"]=== true){
-    //     moveObjectOnDKey(mainCube);
-    // }
-    // if(pressed["KeyA"]=== true){
-    //     moveObjectOnAKey(mainCube);
-    // }
-    // if(pressed["KeyW"]=== true){
-    //     moveObjectOnWKey(mainCube);
-    // }
-    // if(pressed["KeyS"]=== true){
-    //     moveObjectOnSKey(mainCube);
-    // }
 
+    if(pressed["KeyR"]) resetCubes();
 
-let moveX = 0;
-let moveZ = 0;
-
-// check keys
-if (pressed["KeyW"]) { moveX-= 5;  moveZ-= 5;}   // forward
-if (pressed["KeyS"]){moveX += 5;moveZ += 5;}   // backward
-if (pressed["KeyA"]) {moveX -=5;moveZ += 5;}  // left
-if (pressed["KeyD"]) {moveX+=5 ; moveZ -= 5;}  // right
-
-// create a direction vector
-let dir = new THREE.Vector3(moveX, 0, moveZ);
-
-// normalize so diagonal speed = straight speed
-if (dir.length() > 0) {
-  dir.normalize();
-  
-  // apply movement (example: impulse or set linvel)
-  const speed = 15.0;
-  mainCube.body.setLinvel(
-    {
-      x: dir.x * speed,
-      y: mainCube.body.linvel().y, // keep current vertical velocity (gravity/jumps)
-      z: dir.z * speed,
-    },
-    true
-  );
-}
+    processMovement();
 
 
 
@@ -216,7 +198,7 @@ if (dir.length() > 0) {
 
     controls.update();
     controls.target.set(mainCube.mesh.position.x, mainCube.mesh.position.y, mainCube.mesh.position.z);
-    camera.position.set(mainCube.mesh.position.x+6, mainCube.mesh.position.y+7, mainCube.mesh.position.z+8);
+    camera.position.set(mainCube.mesh.position.x + cameraDefaultPos.x, mainCube.mesh.position.y + cameraDefaultPos.y, mainCube.mesh.position.z + cameraDefaultPos.z);
 
     renderer.render(scene, camera);
 }
