@@ -166,7 +166,7 @@ function processMovement() {
 
         // 3. shortest angle difference
         let delta = targetAngle - currentAngle;
-        delta = Math.atan2(Math.sin(delta), Math.cos(delta)); // normalize to [-π, π]
+        delta = Math.atan2(Math.sin(delta), Math.cos(delta)); // normalize to [-pi, pi]
 
         // 4. choose rotation speed
         const angVel = delta * turnSpeed;
