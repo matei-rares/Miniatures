@@ -201,8 +201,6 @@ function animate(now = performance.now()) {
     processMovement();
 
 
-
-
     // Sync Three meshes from Rapier bodies
     for (const { mesh, body } of boxes) {
         const t = body.translation();
