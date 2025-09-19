@@ -14,13 +14,14 @@ npm install @dimforge/rapier3d-compat
 npm install --save-dev vitest
 
 # Run the local server at localhost:8080
-npm run dev
+npm run dev (will use the package reffered in package.json at "dev")
+npx vite
 
 # Build for production in the dist/ directory
 npm run build
 
-WHAT YOU WILL USE
-npx vite
+
+
 
 
 Tests
