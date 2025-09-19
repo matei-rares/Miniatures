@@ -10,7 +10,7 @@ public class WebSocketController {
 
     @MessageMapping("/chat.send")     // listens on /app/chat.send
     @SendTo("/topic/messages")        // sends to /topic/messages
-    public ChatMessage sendMessage(ChatMessage message) {
+    public SenderModel sendMessage( SenderModel message) {
         return message; // echoes back the received message
     }
 }

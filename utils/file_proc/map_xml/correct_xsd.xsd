@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<xs:schema targetNamespace="http://www.w3.org/2003/XInclude" 
+	xmlns:xi="http://www.w3.org/2003/XInclude" 
+	xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+	elementFormDefault="unqualified" 
+	attributeFormDefault="unqualified" 
+	finalDefault="extension">
+	<xs:element name="REQ">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="REQUIREMENTS" minOccurs="0" maxOccurs="1">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="REQUIREMENT" minOccurs="0" maxOccurs="unbounded">
+								<xs:complexType>
+									<xs:attribute name="ID"                         type="xs:string"/> <!-- ID                     -->
+									<xs:attribute name="Text"                       type="xs:string"/> <!-- SW Requirements        -->
+									<xs:attribute name="c_This_is_a"                type="xs:string"/> <!-- c_This_is_a            -->
+									<xs:attribute name="c_SIL"                      type="xs:string"/> <!-- c_SIL                  -->
+									<xs:attribute name="c_Function"                 type="xs:string"/> <!-- c_Function             -->
+									
+									<xs:attribute name="c_Security_and_Privacy"     type="xs:string"/> <!-- c_Security_and_Privacy -->
+									<xs:attribute name="c_Remark"                   type="xs:string"/> <!-- c_Remark               -->
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

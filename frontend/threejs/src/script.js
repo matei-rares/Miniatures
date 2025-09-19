@@ -36,13 +36,7 @@ dir.castShadow = true;
 dir.shadow.mapSize.set(1024, 1024);
 scene.add(dir);
 
-// Ground (visual)
-const groundGeo = new THREE.PlaneGeometry(40, 40);
-const groundMat = new THREE.MeshStandardMaterial({ color: 0x20273a, metalness: 0.0, roughness: 1.9 });
-const ground = new THREE.Mesh(groundGeo, groundMat);
-ground.rotation.x = -Math.PI / 2;
-ground.receiveShadow = true;
-scene.add(ground);
+
 
 // --- Rapier physics setup ---
 await RAPIER.init();
@@ -51,6 +45,15 @@ const world = new RAPIER.World(gravity);
 
 // Ground (physics): large static box under y=0
 {
+
+    // Ground (visual)
+    const groundGeo = new THREE.PlaneGeometry(40, 40);
+    const groundMat = new THREE.MeshStandardMaterial({ color: 0x20273a, metalness: 0.0, roughness: 1.9 });
+    const ground = new THREE.Mesh(groundGeo, groundMat);
+    ground.rotation.x = -Math.PI / 2;
+    ground.receiveShadow = true;
+    scene.add(ground);
+
     const groundBodyDesc = RAPIER.RigidBodyDesc.fixed().setTranslation(0, -0.5, 0);
     const groundBody = world.createRigidBody(groundBodyDesc);
     const groundColliderDesc = RAPIER.ColliderDesc.cuboid(20, 0.5, 20).setFriction(0.5);
@@ -93,11 +96,11 @@ const loader = new GLTFLoader();
 let player;
 
 loader.load('/static/model.glb', (gltf) => {
-  player = gltf.scene;
-  player.scale.set(0.5,0.5, 0.5); // resize
-  scene.add(player);
+    player = gltf.scene;
+    player.scale.set(0.5, 0.5, 0.5); // resize
+    scene.add(player);
 }, undefined, (error) => {
-  console.error(error);
+    console.error(error);
 });
 
 // --- Create two cubes ---
@@ -128,7 +131,7 @@ const pressed = {}
 function processMovement() {
     let moveX = 0;
     let moveZ = 0;
-    const speed = 4.0;
+    const movementSpeed = 4.0;
     const turnSpeed = 10.0; // radians/sec
     // check keys
     if (pressed["KeyW"]) { moveZ -= 5; }   // forward
@@ -148,9 +151,9 @@ function processMovement() {
         //obj.body.applyImpulse({ x: 5, y: 0, z: -5 }, true);
         //obj.body.setAngvel({ x: 0, y: 0, z: 0 }, true);
         mainCube.body.setLinvel({
-            x: dir.x * speed,
+            x: dir.x * movementSpeed,
             y: mainCube.body.linvel().y, // keep current vertical velocity (gravity/jumps)
-            z: dir.z * speed,
+            z: dir.z * movementSpeed,
         }, true
         );
 
