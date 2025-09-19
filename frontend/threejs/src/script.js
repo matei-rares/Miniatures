@@ -93,15 +93,35 @@ function makeCube({ position = [0, 1, 0], size = 1, color = 0x66aaff, name = 'cu
 
 
 const loader = new GLTFLoader();
-let player;
+let car;
 
-loader.load('/static/model.glb', (gltf) => {
-    player = gltf.scene;
-    player.scale.set(0.5, 0.5, 0.5); // resize
-    scene.add(player);
-}, undefined, (error) => {
-    console.error(error);
-});
+loader.load('/static/mazda.gltf', ( gltf ) =>{
+
+		scene.add( gltf.scene );
+
+        car = gltf
+        
+		gltf.animations; // Array<THREE.AnimationClip>
+		gltf.scene; // THREE.Group
+		gltf.scenes; // Array<THREE.Group>
+		gltf.cameras; // Array<THREE.Camera>
+		gltf.asset; // Object
+console.log(car)
+
+	},
+	// called while loading is progressing
+	function ( xhr ) {
+
+		console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+
+	},
+	// called when loading has errors
+	function ( error ) {
+
+		console.log( 'An error happened' );
+
+	}
+);
 
 // --- Create two cubes ---
 const initialCubePosition = [1.25, 3, 0]
@@ -214,7 +234,7 @@ function animate(now = performance.now()) {
 
     controls.update();
     controls.target.set(mainCube.mesh.position.x, mainCube.mesh.position.y, mainCube.mesh.position.z);
-    camera.position.set(mainCube.mesh.position.x + cameraDefaultPos.x, mainCube.mesh.position.y + cameraDefaultPos.y, mainCube.mesh.position.z + cameraDefaultPos.z);
+    //camera.position.set(mainCube.mesh.position.x + cameraDefaultPos.x, mainCube.mesh.position.y + cameraDefaultPos.y, mainCube.mesh.position.z + cameraDefaultPos.z);
 
     renderer.render(scene, camera);
 }
