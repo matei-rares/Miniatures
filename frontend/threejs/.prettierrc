@@ -1,0 +1,11 @@
+{
+  "printWidth": 250,
+  "tabWidth": 2,
+  "trailingComma": "es5",
+  "semi": true,
+  "singleQuote": true,
+  "arrowParens": "always",
+   "rules": {
+    "object-curly-newline": ["error", { "multiline": false, "consistent": true }]
+  }
+}
