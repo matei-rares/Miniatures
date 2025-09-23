@@ -169,7 +169,7 @@ let params = RAPIER.JointData.revolute(
     { x: 1.0 , y: 0.0, z: 0.0 }, { w: 10.0, x: 0.0, y: 0.0, z: 0.0 },
     { x: 0.0 , y: 5.0, z: 0.0 }, { w: 10.0, x: 0.0, y: 0.0, z: 0.0 }
 );
-
+//?????????????????????????????????????
  world.createImpulseJoint(RAPIER.JointData.fixed(
     { x: 0.0 , y: 0.0, z: 0.0 }, { w: 1.0, x: 0.0, y: 0.0, z: 0.0 },
     { x: 0.0 , y: 1.0, z: 0.0 }, { w: 1.0, x: 0.0, y: 0.0, z: 0.0 }
