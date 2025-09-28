@@ -113,7 +113,7 @@ loader.load(
     const carMaterial = carObject.material;
     const carGeometry = carObject.geometry;
     const carMesh = new THREE.Mesh(carGeometry, carMaterial);
-    let carDefaultPostion = new THREE.Vector3(1, 2, 2);
+    let carDefaultPostion = new THREE.Vector3(1, 3, 2);
     console.log(carObject);
     carMaterial.wireframe = true;
     carMesh.castShadow = true;
@@ -131,6 +131,7 @@ loader.load(
     car = { mesh: carMesh, rigidBody };
 
     for (const [index, wheel] of carObject.children.entries()) {
+      if (index < 1){
       const wheelGeometry = wheel.geometry;
       const wheelMaterial = wheel.material;
       console.log(wheelMaterial)
@@ -158,11 +159,7 @@ loader.load(
 
 const rbPosition = rigidBody.translation(); // returns {x, y, z}
 
-// Convert to THREE.Vector3
-const meshPosition = new THREE.Vector3(rbPosition.x, rbPosition.y, rbPosition.z);
-
-console.log("Mesh position from Rapier relative to scene:", meshPosition);
-
+      }
     }
     console.log(wheels);
 let params = RAPIER.JointData.revolute(
@@ -171,22 +168,22 @@ let params = RAPIER.JointData.revolute(
 );
 
 //?????????????????????????????????????
- world.createImpulseJoint(RAPIER.JointData.fixed(
-    { x: 0.0 , y: 0.0, z: 0.0 }, { w: 1.0, x: 0.0, y: 0.0, z: 0.0 },
-    { x: 0.0 , y: 1.0, z: 0.0 }, { w: 1.0, x: 0.0, y: 0.0, z: 0.0 }
-), car.rigidBody, wheels[0].rigidBody, true);
- world.createImpulseJoint(RAPIER.JointData.fixed(
-    { x: 0.0 , y: 0.0, z: 0.0 }, { w: 1.0, x: 0.0, y: 0.0, z: 0.0 },
-    { x: 0.0 , y: 1.0, z: 0.0 }, { w: 1.0, x: 0.0, y: 0.0, z: 0.0 }
-), car.rigidBody, wheels[0].rigidBody, true);
-world.createImpulseJoint(RAPIER.JointData.fixed(
-    { x: 0.0 , y: 0.0, z: 0.0 }, { w: 1.0, x: 0.0, y: 0.0, z: 0.0 },
-    { x: 0.0 , y: 1.0, z: 0.0 }, { w: 1.0, x: 0.0, y: 0.0, z: 0.0 }
-), car.rigidBody, wheels[0].rigidBody, true);
-world.createImpulseJoint(RAPIER.JointData.fixed(
-    { x: 0.0 , y: 0.0, z: 0.0 }, { w: 1.0, x: 0.0, y: 0.0, z: 0.0 },
-    { x: 0.0 , y: 1.0, z: 0.0 }, { w: 1.0, x: 0.0, y: 0.0, z: 0.0 }
-), car.rigidBody, wheels[0].rigidBody, true);
+//  world.createImpulseJoint(RAPIER.JointData.fixed(
+//     { x: -1.0 , y: 0.0, z: -1.0 }, { w: 1.0, x: 0.0, y: 0.0, z: 0.0 },
+//     { x: -1.0 , y: 1.0, z: -1.0 }, { w: 1.0, x: 0.0, y: 0.0, z: 0.0 }
+// ), car.rigidBody, wheels[0].rigidBody, true);
+//  world.createImpulseJoint(RAPIER.JointData.fixed(
+//     { x: 1.0 , y: 0.0, z: -1.0 }, { w: 1.0, x: 0.0, y: 0.0, z: 0.0 },
+//     { x: 1.0 , y: 1.0, z: -1.0 }, { w: 1.0, x: 0.0, y: 0.0, z: 0.0 }
+// ), car.rigidBody, wheels[0].rigidBody, true);
+// world.createImpulseJoint(RAPIER.JointData.fixed(
+//     { x: 1.0 , y: 0.0, z: 1.0 }, { w: 1.0, x: 0.0, y: 0.0, z: 0.0 },
+//     { x: 1.0 , y: 1.0, z: 1.0 }, { w: 1.0, x: 0.0, y: 0.0, z: 0.0 }
+// ), car.rigidBody, wheels[0].rigidBody, true);
+// world.createImpulseJoint(RAPIER.JointData.fixed(
+//     { x: -1.0 , y: 0.0, z: 1.0 }, { w: 1.0, x: 0.0, y: 0.0, z: 0.0 },
+//     { x: -1.0 , y: 1.0, z: 1.0 }, { w: 1.0, x: 0.0, y: 0.0, z: 0.0 }
+// ), car.rigidBody, wheels[0].rigidBody, true);
 
 
 
@@ -293,7 +290,20 @@ function updateMeshPositionByRigidBody(dict) {
   dict.mesh.quaternion.set(r.x, r.y, r.z, r.w);
 }
 
+
+
+
+// Handle resize
+addEventListener('resize', () => {
+  camera.aspect = innerWidth / innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth + 10, innerHeight + 10);
+});
+
+
+
 //main function--------------------------------------------
+
 function animate(now = performance.now()) {
   requestAnimationFrame(animate);
   const dt = Math.min(0.033, (now - last) / 1000);
@@ -335,10 +345,3 @@ function animate(now = performance.now()) {
   renderer.render(scene, camera);
 }
 animate();
-
-// Handle resize
-addEventListener('resize', () => {
-  camera.aspect = innerWidth / innerHeight;
-  camera.updateProjectionMatrix();
-  renderer.setSize(innerWidth + 10, innerHeight + 10);
-});
