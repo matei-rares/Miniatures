@@ -17,6 +17,7 @@
   "dependencies": {
     "@dimforge/rapier3d": "^0.18.2",
     "@dimforge/rapier3d-compat": "^0.18.2",
+    "lil-gui": "^0.20.0",
     "three": "^0.174.0"
   }
 }

@@ -2,6 +2,13 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import RAPIER from '@dimforge/rapier3d-compat';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import GUI from 'lil-gui'
+
+/**
+ * Debug
+ */
+const gui = new GUI()
+
 
 // --- Three.js setup ---
 const container = document.getElementById('app');
@@ -18,7 +25,7 @@ scene.background = new THREE.Color(0xd2f7ff);
 
 //Camera
 const camera = new THREE.PerspectiveCamera(60, innerWidth / innerHeight, 0.1, 200);
-const cameraDefaultPos = new THREE.Vector3(3, 2, 4);
+const cameraDefaultPos = new THREE.Vector3(5, 3, 4);
 camera.position.set(cameraDefaultPos.x, cameraDefaultPos.y, cameraDefaultPos.z);
 
 //View Target
@@ -55,6 +62,10 @@ const world = new RAPIER.World(gravity);
   const groundColliderDesc = RAPIER.ColliderDesc.cuboid(20, 0.5, 20).setFriction(0.5);
   world.createCollider(groundColliderDesc, groundBody);
 }
+
+
+
+
 
 //-----------------------------------------------------------------------------------------------------------------------//
 // Create a cube (Three + Rapier) and return pair
