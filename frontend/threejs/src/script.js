@@ -4,6 +4,7 @@ import RAPIER from '@dimforge/rapier3d-compat';
 import GUI from 'lil-gui'
 import { CubeObject } from './objects/cubes';
 import { CarObject } from './objects/car';
+
 /**
  * Debug
  */
@@ -44,6 +45,34 @@ scene.add(dir);
 await RAPIER.init();
 const gravity = { x: 0.0, y: -20.81, z: 0.0 };
 const world = new RAPIER.World(gravity);
+
+
+class RapierDebugRenderer {
+  mesh
+  world
+  enabled = true
+  
+  constructor(scene, world) {
+    this.world = world
+    this.mesh = new THREE.LineSegments(new THREE.BufferGeometry(), new THREE.LineBasicMaterial({ color: 0xffffff, vertexColors: true }))
+    this.mesh.frustumCulled = false
+    scene.add(this.mesh)
+  }
+  
+  update() {
+    if (this.enabled) {
+      const { vertices, colors } = this.world.debugRender()
+      this.mesh.geometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3))
+      this.mesh.geometry.setAttribute('color', new THREE.BufferAttribute(colors, 4))
+      this.mesh.visible = true
+    } else {
+      this.mesh.visible = false
+    }
+  }
+}
+
+const debugRenderer = new RapierDebugRenderer(scene, world);
+
 
 // Ground (visual)
 const groundGeo = new THREE.PlaneGeometry(40, 40);
@@ -95,6 +124,7 @@ function animate(now = performance.now()) {
 
   CUBES.updateCubes();
   CAR.updateCar();
+  debugRenderer.update()
   
   //End of main function---------------------------------------
   controls.update();
