@@ -4,7 +4,7 @@ import RAPIER from '@dimforge/rapier3d-compat';
 import GUI from 'lil-gui'
 import { CubeObject } from './objects/cubes';
 import { CarObject } from './objects/car';
-
+import {RapierDebugRenderer} from './objects/RapierDebugRenderer'
 /**
  * Debug
  */
@@ -46,34 +46,6 @@ await RAPIER.init();
 const gravity = { x: 0.0, y: -20.81, z: 0.0 };
 const world = new RAPIER.World(gravity);
 
-
-class RapierDebugRenderer {
-  mesh
-  world
-  enabled = true
-  
-  constructor(scene, world) {
-    this.world = world
-    this.mesh = new THREE.LineSegments(new THREE.BufferGeometry(), new THREE.LineBasicMaterial({ color: 0xffffff, vertexColors: true }))
-    this.mesh.frustumCulled = false
-    scene.add(this.mesh)
-  }
-  
-  update() {
-    if (this.enabled) {
-      const { vertices, colors } = this.world.debugRender()
-      this.mesh.geometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3))
-      this.mesh.geometry.setAttribute('color', new THREE.BufferAttribute(colors, 4))
-      this.mesh.visible = true
-    } else {
-      this.mesh.visible = false
-    }
-  }
-}
-
-const debugRenderer = new RapierDebugRenderer(scene, world);
-
-
 // Ground (visual)
 const groundGeo = new THREE.PlaneGeometry(40, 40);
 const groundMat = new THREE.MeshStandardMaterial({ color: 0x2c4d04, metalness: 0.0, roughness: 1.9 });
@@ -100,6 +72,7 @@ world.createCollider(groundColliderDesc, groundBody);
 
 const CUBES = new CubeObject(scene, world)
 const CAR= new CarObject(scene,world)
+const debugRenderer = new RapierDebugRenderer(scene, world);
 
 
 // --- Animation loop with fixed-step accumulator ---
@@ -122,8 +95,8 @@ function animate(now = performance.now()) {
   }
   //Use of objects--------------------------------------------
 
-  CUBES.updateCubes();
-  CAR.updateCar();
+  CUBES.update();
+  CAR.update();
   debugRenderer.update()
   
   //End of main function---------------------------------------

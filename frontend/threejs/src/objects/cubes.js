@@ -121,7 +121,7 @@ updateMeshPositionByRigidBody(dict) {
   });
 }
 
-  updateCubes() {
+  update() {
     if (this.pressed['KeyR']) this.resetCubes();
 
     this.processMovement();
