@@ -6,9 +6,9 @@ export class CubeObject {
     this.boxes = [];
 
     // --- Create two cubes ---
-    this.initialCubePosition = [1.25, 3, 0];
+    this.initialCubePosition = [4, 3, -4];
     this.makeCube(scene, world,{ position: this.initialCubePosition, size: 1, color: 0x66aaff, name: 'Cube A' });
-    this.makeCube(scene, world, { position: [-1.25, 3, 0], size: 1, color: 0xff7780, name: 'Cube B' });
+   // this.makeCube(scene, world, { position: [-1.25, 3, 0], size: 1, color: 0xff7780, name: 'Cube B' });
     this.mainCube = this.boxes[0];
 
     //Bind Keyboard keys Listeners (for Movement, reset)

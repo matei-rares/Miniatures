@@ -1,10 +1,11 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import RAPIER from '@dimforge/rapier3d-compat';
-import GUI from 'lil-gui'
 import { CubeObject } from './objects/cubes';
 import { CarObject } from './objects/car';
 import {RapierDebugRenderer} from './objects/RapierDebugRenderer'
+import GUI from 'lil-gui'
+
 /**
  * Debug
  */
@@ -71,7 +72,7 @@ world.createCollider(groundColliderDesc, groundBody);
 //Declaration of objects--------------------------------------
 
 const CUBES = new CubeObject(scene, world)
-const CAR= new CarObject(scene,world)
+const CAR= new CarObject(scene,world,gui)
 const debugRenderer = new RapierDebugRenderer(scene, world);
 
 
