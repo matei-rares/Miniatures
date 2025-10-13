@@ -3,11 +3,11 @@ import RAPIER from '@dimforge/rapier3d-compat';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 
 var carDefaultPostion = new THREE.Vector3(0, 3, 0);
-
+var counter = 0;
 export class CarObject {
   constructor(scene, world, gui) {
     this.gui = gui;
-    this.wheelDebug = {};
+    this.carDebug = {};
     this.loader = new GLTFLoader();
     this.wheels = [];
     this.car = { mesh: 0, rigidBody: 0 };
@@ -131,8 +131,8 @@ export class CarObject {
           console.log(rigidBody);
           world.createCollider(colliderDesc, rigidBody);
 
-          const targetAngle = Math.PI / 2;
-          rigidBody.setRotation({ x: 0, y: -targetAngle, z: -targetAngle, w: 0 }, false);
+          // const targetAngle = Math.PI / 2;
+          // rigidBody.setRotation({ x: 0, y: -targetAngle, z: -targetAngle, w: 0 }, false);
 
           this.wheels[i] = { mesh: wheelsObj[i], rigidBody };
           console.log(this.wheels[i]);
@@ -235,14 +235,14 @@ export class CarObject {
       }
     }
   }
- updateRotation() {
+  updateRotation() {
     // Convert Euler to quaternion for Rapier
-    const euler = new THREE.Euler(this.wheelDebug.rotX, this.wheelDebug.rotY, this.wheelDebug.rotZ);
+    const euler = new THREE.Euler(this.carDebug.rotX, this.carDebug.rotY, this.carDebug.rotZ);
     const q = new THREE.Quaternion().setFromEuler(euler);
     this.car.rigidBody.setRotation({ x: q.x, y: q.y, z: q.z, w: q.w }, true);
   }
-  initDebug() {
-    this.wheelDebug = {
+  initDebugUi() {
+    this.carDebug = {
       posX: this.car.rigidBody.translation().x,
       posY: this.car.rigidBody.translation().y,
       posZ: this.car.rigidBody.translation().z,
@@ -252,47 +252,47 @@ export class CarObject {
     };
 
     // Position controls
-    this.gui.add(this.wheelDebug, 'posX', -5, 5, 0.01).onChange(() => {
+    this.gui.add(this.carDebug, 'posX', -5, 5, 0.01).onChange(() => {
       this.car.rigidBody.setTranslation(
         {
-          x: this.wheelDebug.posX,
-          y: this.wheelDebug.posY,
-          z: this.wheelDebug.posZ,
+          x: this.carDebug.posX,
+          y: this.carDebug.posY,
+          z: this.carDebug.posZ,
         },
         true
       );
     });
 
-    this.gui.add(this.wheelDebug, 'posY', -5, 5, 0.01).onChange(() => {
+    this.gui.add(this.carDebug, 'posY', -5, 5, 0.01).onChange(() => {
       this.car.rigidBody.setTranslation(
         {
-          x: this.wheelDebug.posX,
-          y: this.wheelDebug.posY,
-          z: this.wheelDebug.posZ,
+          x: this.carDebug.posX,
+          y: this.carDebug.posY,
+          z: this.carDebug.posZ,
         },
         true
       );
     });
 
-    this.gui.add(this.wheelDebug, 'posZ', -5, 5, 0.01).onChange(() => {
+    this.gui.add(this.carDebug, 'posZ', -5, 5, 0.01).onChange(() => {
       this.car.rigidBody.setTranslation(
         {
-          x: this.wheelDebug.posX,
-          y: this.wheelDebug.posY,
-          z: this.wheelDebug.posZ,
+          x: this.carDebug.posX,
+          y: this.carDebug.posY,
+          z: this.carDebug.posZ,
         },
         true
       );
     });
 
     // Rotation controls (Euler angles in radians)
-    this.gui.add(this.wheelDebug, 'rotX', -Math.PI, Math.PI, 0.01).onChange(this.updateRotation);
-    this.gui.add(this.wheelDebug, 'rotY', -Math.PI, Math.PI, 0.01).onChange(this.updateRotation);
-    this.gui.add(this.wheelDebug, 'rotZ', -Math.PI, Math.PI, 0.01).onChange(this.updateRotation);
+    this.gui.add(this.carDebug, 'rotX', -Math.PI, Math.PI, 0.01).onChange(this.updateRotation);
+    this.gui.add(this.carDebug, 'rotY', -Math.PI, Math.PI, 0.01).onChange(this.updateRotation);
+    this.gui.add(this.carDebug, 'rotZ', -Math.PI, Math.PI, 0.01).onChange(this.updateRotation);
   }
- 
+
   update() {
-    this.processMovement();
+    // this.processMovement();
 
     if (this.isLoaderCarDone) {
       this.updateRotation();
@@ -302,20 +302,37 @@ export class CarObject {
       //    this.car.rigidBody.setEnabledRotations(false, false, false, false);
       // this.car.rigidBody.setAngvel({ x: 0, y: 0, z: 0 }, true);
 
-      this.car.mesh.position.copy(this.car.rigidBody.translation());
-      this.car.mesh.quaternion.copy(this.car.rigidBody.rotation());
+
 
       // this.dynamicBodies[i][0].quaternion.copy(this.dynamicBodies[i][1].rotation())
+
+      this.car.mesh.position.copy(this.car.rigidBody.translation());
+      this.car.mesh.quaternion.copy(this.car.rigidBody.rotation());
     }
 
     if (this.isLoaderWheelDone) {
       for (let i = 0; i < this.wheels.length; i++) {
+        const targetAngle = Math.PI / 2;
         this.wheels[i].mesh.position.copy(this.wheels[i].rigidBody.translation());
         this.wheels[i].mesh.quaternion.copy(this.wheels[i].rigidBody.rotation());
         // const t = this.wheels[i].rigidBody.translation();
         // const r = this.wheels[i].rigidBody.rotation();
-        this.wheels[i].rigidBody.setRotation({ x: 0, y: Math.PI / 2, z: 0 }, true);
-        this.wheels[i].rigidBody.setEnabledRotations(false, false, false, false);
+
+        //this.wheels[i].rigidBody.setRotation({ x: counter, y: Math.PI/2 , z:counter}, true);
+        counter += 0.5
+        if (counter > 100) {
+          counter = 0;
+        }
+        const euler = new THREE.Euler(0, counter, 0);
+        const quat = new THREE.Quaternion().setFromEuler(euler);
+
+       //this.wheels[i].rigidBody.setRotation({ x: 0, y: -targetAngle, z: -targetAngle, w: 0 }, false);
+
+        //this.wheels[i].rigidBody.setEnabledRotations(false, false, false, true);
+        //this.wheels[i].rigidBody.setRotation(quat, true);
+   
+          
+
 
         // this.wheels[i].mesh.position.set(t.x, t.y, t.z);
         // this.wheels[i].mesh.quaternion.set(r.x, r.y, r.z, r.w);
@@ -324,22 +341,29 @@ export class CarObject {
         //this.wheels[i].rigidBody.setRotation({ x: Math.PI / (2 + this.count), y: 0, z:0 }, true);
 
         //this.count +=10
+
       }
     }
 
     if (this.isLoaderCarDone && this.isLoaderWheelDone && !this.finalInit) {
-      this.initDebug();
+      this.initDebugUi();
       // this.world.createImpulseJoint(RAPIER.JointData.revolute(
-      //     new RAPIER.Vector3(3, 0, 3), new RAPIER.Vector3(1, 0, 0), new RAPIER.Vector3(1, -1, 0)), this.wheelBL.rigidBody,  this.car.rigidBody,true)
+      // new RAPIER.Vector3(3, 0, 3), new RAPIER.Vector3(1, 0, 0), new RAPIER.Vector3(1, -1, 0)), this.wheelBL.rigidBody,  this.car.rigidBody,true)
 
-      //this.wheelBR.rigidBody.setRotation({ x: 0, y: Math.PI/2, z: 0 }, true);
+      //       //wheel point | car point | car body | wheel body
+      // this.world.createImpulseJoint(RAPIER.JointData.spherical(new RAPIER.Vector3(2, 1, 2), new RAPIER.Vector3(0, 0, 0)), this.car.rigidBody, this.wheelBL.rigidBody, true);
+      // this.world.createImpulseJoint(RAPIER.JointData.spherical(new RAPIER.Vector3(2, 1, -2), new RAPIER.Vector3(0, 0, 0)), this.car.rigidBody, this.wheelBR.rigidBody, true);
+      // this.world.createImpulseJoint(RAPIER.JointData.spherical(new RAPIER.Vector3(-2,1, -2), new RAPIER.Vector3(0, 0, 0)), this.car.rigidBody, this.wheelFR.rigidBody, true);
+      // this.world.createImpulseJoint(RAPIER.JointData.spherical(new RAPIER.Vector3(-2, 1, 2), new RAPIER.Vector3(0, 0, 0)), this.car.rigidBody, this.wheelFL.rigidBody, true);
+        function getvector(x,y,z){
+          return {x:x,y:y,z:z}
+        }
+       this.world.createImpulseJoint(RAPIER.JointData.revolute(getvector(2, 1, 2), getvector(0, 0, 0),getvector(1,0,0 )), this.car.rigidBody, this.wheelBL.rigidBody, true);
+      this.world.createImpulseJoint(RAPIER.JointData.revolute(getvector(2, 1, -2),getvector(0, 0, 0),getvector(1,0,0 )), this.car.rigidBody, this.wheelBR.rigidBody, true);
+      this.world.createImpulseJoint(RAPIER.JointData.revolute(getvector(-2,1, -2), getvector(0, 0, 0),getvector(1,0,0 )), this.car.rigidBody, this.wheelFR.rigidBody, true);
+      this.world.createImpulseJoint(RAPIER.JointData.revolute(getvector(-2, 1, 2), getvector(0, 0, 0),getvector(1,0,0 )), this.car.rigidBody, this.wheelFL.rigidBody, true);
 
-      this.world.createImpulseJoint(RAPIER.JointData.spherical(new RAPIER.Vector3(2, 2, 2), new RAPIER.Vector3(0, 0, 0)), this.car.rigidBody, this.wheelBL.rigidBody, true);
-      this.world.createImpulseJoint(RAPIER.JointData.spherical(new RAPIER.Vector3(2, 2, -2), new RAPIER.Vector3(0, 0, 0)), this.car.rigidBody, this.wheelBR.rigidBody, true);
-      this.world.createImpulseJoint(RAPIER.JointData.spherical(new RAPIER.Vector3(-2, 2, -2), new RAPIER.Vector3(0, 0, 0)), this.car.rigidBody, this.wheelFR.rigidBody, true);
-      this.world.createImpulseJoint(RAPIER.JointData.spherical(new RAPIER.Vector3(-2, 2, 2), new RAPIER.Vector3(0, 0, 0)), this.car.rigidBody, this.wheelFL.rigidBody, true);
-
-      this.wheelFL.mesh.rotation.y = Math.PI / 2; // rotate 90° so cylinder axis aligns correctly
+      // this.wheelFL.mesh.rotation.y = Math.PI / 2; // rotate 90° so cylinder axis aligns correctly
 
       this.finalInit = true;
     }
