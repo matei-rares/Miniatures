@@ -5,7 +5,7 @@ import { CubeObject } from './objects/cubes';
 import { CarObject } from './objects/car';
 import {RapierDebugRenderer} from './objects/RapierDebugRenderer'
 import GUI from 'lil-gui'
-
+//https://github.com/brunosimon/folio-2019/tree/master/static/models/car
 /**
  * Debug
  */

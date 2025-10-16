@@ -1,0 +1,16 @@
+powershell (win + x)
+rundll32.exe advapi32.dll,ProcessIdleTasks
+Get-Process | Where-Object { $_.WorkingSet -gt 100MB } | ForEach-Object { $_.Refresh() }
+Remove-Item "$env:TEMP\*" -Recurse -Force -ErrorAction SilentlyContinue
+
+taskkill /f /im explorer.exe ; start explorer.exe
+ipconfig /flushdns
+
+Clear-RecycleBin -Force
+
+Get-Service | Where-Object { $_.Status -eq 'Running' -and $_.StartType -eq 'Automatic' } | Restart-Service -Force
+
+
+cmd
+
+taskkill /f /im explorer.exe & start explorer.exe
